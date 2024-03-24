@@ -46,6 +46,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// server.js
+
 app.get('/unknown', async(req, res, next) => {
   const { query } = req.query;
   try {
@@ -53,10 +55,9 @@ app.get('/unknown', async(req, res, next) => {
 
     const plumbers = rows.map(user => `
         <div class="mycard relative">
-          <p class="absolute top-2 right-3 text-black/60 inline-flex items-center text-xs">Online <span class="ml-2 w-2 h-2 block bg-green-500 rounded-full group-hover:animate-pulse"></span></p>
-          <img class="profile-picture" src="https://picsum.photos/250/200" alt="Profile Picture">
-          <div class="name search-result">${user.plumber_full_names}</div>
-          <div class="location">New York, NY</div>
+          <img class="profile-picture" src="./user.jpg" alt="Profile Picture" width="100%">
+          <div class="name search-result"><span>${user.plumber_full_names}</span> <span><img src="./star-svg.svg" width=15/> 3 </span></div>
+          <div class="location"><img src="./location-pin-svg.svg" width=15/> ${user.locality ? user.locality : ''}${user.locality ? ',' : ''} ${user.town ? user.town : ''}${user.town ? ',' : ''} ${user.country ? user.country : ''}</div>
           <div class="availability">Available Now</div>
           <div class="rate">$50/hour</div>
         </div>
@@ -72,24 +73,34 @@ app.get('/unknown', async(req, res, next) => {
   }
 });
 
+
 app.get('/search', async (req, res) => {
   const { query } = req.query;
   try {
-    const [rows, fields] = await pool.query('SELECT * FROM plumbers WHERE plumber_full_names LIKE ?', [`%${query}%`]);
+    const [rows, fields] = await pool.query('SELECT * FROM plumbers WHERE plumber_full_names LIKE ? OR country LIKE ? OR city LIKE ? OR town LIKE ?  OR locality LIKE ?', [`%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`]);
+
+    if(rows.length === 0) {
+      res.send(`
+      <div class="mycard relative">
+      <br>
+          No results found.
+        </div>
+      `);
+    }else {
 
     const searchUIResult = rows.map(user => `
         <div class="mycard relative">
-          <p class="absolute top-2 right-3 text-black/60 inline-flex items-center text-xs">Online <span class="ml-2 w-2 h-2 block bg-green-500 rounded-full group-hover:animate-pulse"></span></p>
-          <img class="profile-picture" src="https://picsum.photos/250/200" alt="Profile Picture">
-          <div class="name search-result">${user.plumber_full_names}</div>
-          <div class="location">New York, NY</div>
+          <img class="profile-picture" src="./user.jpg" alt="Profile Picture" width="100%">
+          <div class="name search-result"><span>${user.plumber_full_names}</span> <span><img src="./star-svg.svg" width=15/> 3 </span></div>
+          <div class="location"><img src="./location-pin-svg.svg" width=15/> ${user.locality ? user.locality : ''}${user.locality ? ',' : ''} ${user.town ? user.town : ''}${user.town ? ',' : ''} ${user.country ? user.country : ''}</div>
           <div class="availability">Available Now</div>
-          <div class="rate">$50/hour</div>
+          <div class="rate">NR.50/hour</div>
         </div>
       `).join('');
 
 
     res.status(200).send(searchUIResult);
+    }
   } catch (error) {
     console.error('Error searching users:', error);
     res.status(500).json({ message: 'Internal Server Error' });
@@ -98,10 +109,10 @@ app.get('/search', async (req, res) => {
 
 // Signup Endpoint
 app.post('/signup', async (req, res) => {
-  const { username, email, location, password } = req.body;
+  const { username, email, location, password,phone,country,city,town } = req.body;
   
   try {
-    const [rows, fields] = await pool.query('INSERT INTO plumbers (plumber_full_names, plumber_email, location, plumber_password) VALUES (?, ?, ?, ?  )', [username, email, location, password]);
+    const [rows, fields] = await pool.query('INSERT INTO plumbers (plumber_full_names, plumber_email, location, plumber_password,phone,country,city,town) VALUES (?, ?, ?, ?,?,?,?,?  )', [username, email, location, password,phone,country,city,town]);
     res.status(200).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error('Error signing up:', error);

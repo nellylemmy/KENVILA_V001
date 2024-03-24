@@ -4,9 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Login</h1>
+  <nav>
+    <div class="kepas-nav-items">
+      <ul>
+        <li><a href="/"><img src="./logo.png" alt="logo" width="150" class="logo"></a></li>
+      </ul>
+      <div>
+        <form id="searchForm" hx-get="/search" hx-target="#searchResults" hx-trigger="keyup delay:200ms">
+        <input type="text" name="query" id="searchInput" placeholder="Search by name or location">
+        </form>
+      </div>
+      <ul>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Signup</a></li>
+      </ul>
+    </div>
+  </nav>
+  <h1>Welcome to Plumbit</h1>
+  <h2>Login</h2>
   <form id="loginForm" hx-post="/login">
     <input type="email" name="email" placeholder="Email" required><br>
     <input type="password" name="password" placeholder="Password" required><br>
