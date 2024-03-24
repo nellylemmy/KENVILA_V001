@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="htmx.js"></script>
+  <title>Signup</title>
+</head>
+<body>
+  <h1>SIGNUP</h1>
+  <form id="signupForm" hx-post="/signup">
+    <input type="text" name="username" placeholder="Username" required><br>
+    <input type="email" name="email" placeholder="Email" required><br>
+    <input type="password" name="password" placeholder="Password" required><br>
+    <input type="text" name="location" id="locationInput" placeholder="Location" required><br>
+    <button type="submit">Signup</button>
+  </form>
+
+  <!-- JavaScript for automatic location detection -->
+  <script>
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        console.error('Geolocation is not supported by this browser.');
+      }
+    }
+
+    function showPosition(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      const locationInput = document.getElementById('locationInput');
+      locationInput.value = `Latitude: ${latitude}, Longitude: ${longitude}`;
+    }
+
+    getLocation();
+  </script>
+
+  <!-- JavaScript for Google Places Autocomplete API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLmAmihTyhe_1XvnX4dTUXTZaZwULxHyk&libraries=places"></script>
+  <script>
+    const locationInput = document.getElementById('locationInput');
+    const autocomplete = new google.maps.places.Autocomplete(locationInput);
+  </script>
+</body>
+</html>
